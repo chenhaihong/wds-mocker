@@ -4,7 +4,7 @@ Mocker for wds.
 
 **Example**
 
-webpack.config.js
+`webpack.config.js`
 
 ```javascript
 module.exports = {
@@ -22,7 +22,7 @@ module.exports = {
 };
 ```
 
-mock.js
+`mock/mock.js`
 
 ```javascript
 const sleep = function (delay) {
