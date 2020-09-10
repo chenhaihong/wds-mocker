@@ -4,9 +4,9 @@ const app = express();
 const { createAttachMocker } = require("../");
 
 const attachMocker = createAttachMocker({
-  onUrlencoded: true,
-  onJSONBodyParser: true,
   mockDir: path.resolve(__dirname, "mock"),
+  onUrlencodedParser: true,
+  onJsonBodyParser: true,
 });
 attachMocker(app);
 

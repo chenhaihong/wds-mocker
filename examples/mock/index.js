@@ -13,7 +13,7 @@ module.exports = {
     data: { message: "json" },
   },
 
-  // pure function
+  //  pure function + 动态路由
   "GET /pureFunction": ({ method, path, params, query, body }) => {
     return {
       success: true,

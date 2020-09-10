@@ -10,13 +10,13 @@ Mocker for wds.
 module.exports = {
   devServer: {
     after(app) {
-      const { createMock } = require("wds-mocker");
-      const mock = createMock({
-        onUrlencoded: true,
-        onJSONBodyParser: true,
+      const { createAttachMocker } = require("@erye/wds-mocker");
+      const attachMocker = createAttachMocker({
         mockDir: path.resolve(__dirname, "mock"),
+        onUrlencodedParser: true,
+        onJsonBodyParser: true,
       });
-      mock(app);
+      attachMocker(app);
     },
   },
 };
@@ -34,37 +34,34 @@ const sleep = function (delay) {
 };
 
 module.exports = {
-  "/json": {
-    method: "get",
-    // json对象
-    result: {
+  // json对象
+  "GET /json": {
+    success: true,
+    data: { message: "json" },
+  },
+
+  // pure function
+  "GET /pureFunction": ({ method, path, params, query, body }) => {
+    return {
       success: true,
-      data: { message: "json" },
-    },
+      data: { message: "pureFunction", method, path, params, query, body },
+    };
+  },
+  // pure function + 动态路由
+  "GET /pureFunction/:id": ({ method, path, params, query, body }) => {
+    return {
+      success: true,
+      data: { message: "pureFunction", method, path, params, query, body },
+    };
   },
 
-  "/pureFunction": {
-    method: "get",
-    // pure function
-    result(req, res, next) {
-      return {
-        success: true,
-        data: { message: "pureFunction" },
-      };
-    },
-  },
-
-  "/async": {
-    method: "get",
-    // 异步
-    async result(req, res, next) {
-      await sleep(2000);
-
-      return {
-        success: true,
-        data: { message: "async" },
-      };
-    },
+  // 异步
+  "GET /async": async ({ method, path, params, query, body }) => {
+    await sleep(2000);
+    return {
+      success: true,
+      data: { message: "async", method, path, params, query, body },
+    };
   },
 };
 ```
