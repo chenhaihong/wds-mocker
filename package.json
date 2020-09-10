@@ -1,6 +1,6 @@
 {
   "name": "@erye/wds-mocker",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Mocker for wds.",
   "authors": [
     {
@@ -15,9 +15,7 @@
     "test:example": "cd ./examples && node ./server",
     "pretest:example": "yarn build",
     "build": "npx tsc",
-    "pub": "npm publish --access public",
-    "prepub": "npm run build && nrm use npm",
-    "postpub": "nrm use taobao"
+    "pub": "npm publish --access public --registry https://registry.npmjs.org/"
   },
   "files": [
     "lib",
