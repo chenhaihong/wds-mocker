@@ -7,36 +7,33 @@ const sleep = function (delay) {
 };
 
 module.exports = {
-  "/json": {
-    method: "get",
-    // json对象
-    result: {
+  // json对象
+  "GET /json": {
+    success: true,
+    data: { message: "json" },
+  },
+
+  // pure function
+  "GET /pureFunction": ({ method, path, params, query, body }) => {
+    return {
       success: true,
-      data: { message: "json" },
-    },
+      data: { message: "pureFunction", method, path, params, query, body },
+    };
+  },
+  "GET /pureFunction/:id": ({ method, path, params, query, body }) => {
+    return {
+      success: true,
+      data: { message: "pureFunction", method, path, params, query, body },
+    };
   },
 
-  "/pureFunction": {
-    method: "get",
-    // pure function
-    result(req, res, next) {
-      return {
-        success: true,
-        data: { message: "pureFunction" },
-      };
-    },
-  },
+  // 异步
+  "GET /async": async ({ method, path, params, query, body }) => {
+    await sleep(2000);
 
-  "/async": {
-    method: "get",
-    // 异步
-    async result(req, res, next) {
-      await sleep(2000);
-
-      return {
-        success: true,
-        data: { message: "async" },
-      };
-    },
+    return {
+      success: true,
+      data: { message: "async", method, path, params, query, body },
+    };
   },
 };

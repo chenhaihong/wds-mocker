@@ -1,22 +1,22 @@
 const path = require("path");
 const express = require("express");
 const app = express();
-const { createMock } = require("../");
+const { createAttachMocker } = require("../");
 
-const mock = createMock({
+const attachMocker = createAttachMocker({
   onUrlencoded: true,
   onJSONBodyParser: true,
   mockDir: path.resolve(__dirname, "mock"),
 });
-mock(app);
+attachMocker(app);
 
 app.get("/", (req, res) => res.send("Hello World!"));
 app.use((err, req, res, next) => {
-  if (error) {
-    return res.send(error.message);
+  if (err) {
+    return res.send(err.message);
   }
-  next(new Error("404"));
+  res.send("404");
 });
 
 const port = 3000;
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => console.log(`Listening on port ${port}!`));
