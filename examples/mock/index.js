@@ -10,30 +10,22 @@ module.exports = {
   // json对象
   "GET /json": {
     success: true,
-    data: { message: "json" },
+    data: { message: "hello wds-mocker" },
   },
 
   //  pure function + 动态路由
-  "GET /pureFunction": ({ method, path, params, query, body }) => {
-    return {
-      success: true,
-      data: { message: "pureFunction", method, path, params, query, body },
-    };
+  "GET /pureFunction": () => {
+    return { success: true, data: { message: "pureFunction" } };
   },
-  "GET /pureFunction/:id": ({ method, path, params, query, body }) => {
-    return {
-      success: true,
-      data: { message: "pureFunction", method, path, params, query, body },
-    };
+  // pure function + 动态路由
+  "GET /pureFunction/:id": (req) => {
+    const { params, query } = req;
+    return { success: true, data: { message: "pureFunction", params, query } };
   },
 
   // 异步
-  "GET /async": async ({ method, path, params, query, body }) => {
+  "GET /async": async () => {
     await sleep(2000);
-
-    return {
-      success: true,
-      data: { message: "async", method, path, params, query, body },
-    };
+    return { success: true, data: { message: "async" } };
   },
 };

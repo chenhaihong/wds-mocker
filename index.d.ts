@@ -1,6 +1,6 @@
 import { Application, Request, Response, NextFunction, request } from "express";
-import { type } from "os";
 
+// 模块声明
 declare namespace WdsMocker {
   export function createAttachMocker(options?: MockerOptions): AttachMocker;
 
@@ -8,9 +8,11 @@ declare namespace WdsMocker {
     (app: Application): void;
   };
   type MockerOptions = {
-    mockDir: string;
-    onUrlencodedParser: boolean;
-    onJsonBodyParser: boolean;
+    mockDir?: string;
+    onUrlencodedParser?: boolean;
+    onJsonBodyParser?: boolean;
+    onLogger?: boolean;
+    onWatcher?: boolean;
   };
   interface MockMap<K, V> extends Map {
     [requestPath: string]: ResultMap;
@@ -20,14 +22,13 @@ declare namespace WdsMocker {
   }
   type MockResult =
     | {
-        (param: {
-          method: string; // 请求方法
-          path: string; // 请求路径
-          params: object; // 动态路由的动态参数集
-          query: object; // 查询参数集
-          body: object; // body参数集
-        }): object;
+        (req: Request | undefined, res: Response | undefined): object;
       }
     | object;
+
+  interface EventBus extends NodeJS.EventEmitter {
+    emit(event: "update"): void;
+    on(event: "update", handler: Function): this;
+  }
 }
 export = WdsMocker;

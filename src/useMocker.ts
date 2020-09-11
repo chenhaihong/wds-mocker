@@ -1,12 +1,28 @@
+import { Application, Request, Response, NextFunction } from "express";
+import { MockMap, ResultMap, MockResult } from "../index";
+
 import path from "path";
 import chalk from "chalk";
 import fse from "fs-extra";
 const pathToRegexp = require("path-to-regexp");
 
-import { Application, Request, Response, NextFunction } from "express";
-import { MockMap, ResultMap, MockResult } from "../index";
+import eventBus from "./eventBus";
 
-export default function useMock(app: Application, mockDir: string): void {
+let isUpdated: boolean = true; // mock文件夹的内容是否更新了
+let cachedMockMap: MockMap<string, ResultMap<string, MockResult>> | null = null;
+
+export default function useMocker(
+  app: Application,
+  mockDir: string,
+  options: { onWatcher: boolean; onLogger: boolean }
+): void {
+  const { onWatcher, onLogger } = options;
+  // 0 订阅，监听文件改变
+  if (onWatcher) {
+    eventBus.on("update", () => {
+      isUpdated = true;
+    });
+  }
   app.use(async function (req: Request, res: Response, next: NextFunction) {
     // 1 获取mockMap
     const mockMap = getMockMap(mockDir);
@@ -14,13 +30,13 @@ export default function useMock(app: Application, mockDir: string): void {
     // 2 没mock这个url，且动态路由中也没有匹配项，则next
     let hasMatch = false;
     let matchedResult: any = {};
-    let [isDynamic, dynamicPath, params] = [false, "", {}];
+    let [dynamicPath, params] = ["", {}];
     if (mockMap.has(req.path)) {
       hasMatch = true;
     }
     if (!hasMatch) {
       if ((matchedResult = matchDynamicPath(req.path, mockMap))) {
-        hasMatch = isDynamic = true;
+        hasMatch = true;
         params = matchedResult.params;
         dynamicPath = matchedResult.path;
       }
@@ -29,9 +45,9 @@ export default function useMock(app: Application, mockDir: string): void {
 
     // 3 拿到当前 url 对应的 resultMap
     //   如果没有这个指定的请求类型，且没用通用类型，则next
-    const resultMap = mockMap.get(isDynamic ? dynamicPath : req.path);
+    const resultMap = mockMap.get(dynamicPath || req.path);
     const upCasedMethod = req.method.toUpperCase();
-    let result = null;
+    let result: MockResult;
     if (resultMap.has(upCasedMethod)) {
       result = resultMap.get(upCasedMethod);
     } else if (resultMap.has("*")) {
@@ -41,16 +57,18 @@ export default function useMock(app: Application, mockDir: string): void {
     }
 
     // 4 终端打印提示
-    const _method = chalk.white.bgMagentaBright(` ${upCasedMethod} `);
-    const _mockFlag = chalk.white.bgMagentaBright(" MOCK ");
-    const _url = chalk.magentaBright(req.url);
-    console.log(`${_method} ${_mockFlag} ${_url}`);
+    if (onLogger) {
+      const _method = chalk.white.bgMagentaBright(` ${upCasedMethod} `);
+      const _mockFlag = chalk.white.bgMagentaBright(" WDS-MOCKER ");
+      const _url = chalk.magentaBright(req.url);
+      console.log(`${_method} ${_mockFlag} ${_url}`);
+    }
 
     // 5 执行
     try {
-      const { method, path, query, body } = req;
+      req.params = { ...req.params, ...params };
       typeof result === "function"
-        ? res.json(await result({ method, path, params, query, body }))
+        ? res.json(await result(req, res))
         : res.json(result);
     } catch (error) {
       next(error);
@@ -59,6 +77,12 @@ export default function useMock(app: Application, mockDir: string): void {
 }
 
 function getMockMap(dir: string) {
+  if (isUpdated) {
+    cachedMockMap = null;
+    isUpdated = false;
+  }
+  if (cachedMockMap) return cachedMockMap;
+
   // （1）mock目录下所有的js文件，把他们全部合并到mocks对象
   const mockMap: MockMap<string, ResultMap<string, MockResult>> = new Map();
 
@@ -70,7 +94,7 @@ function getMockMap(dir: string) {
   for (const file of files) {
     const filePath = path.join(dir, file);
     if (fse.statSync(filePath).isFile() && /\.js$/.test(file)) {
-      delete require.cache[require.resolve(filePath)];
+      // delete require.cache[require.resolve(filePath)];
       const list = require(filePath);
       for (const [
         methodUrl, // 比如: ' get  /auth/login '

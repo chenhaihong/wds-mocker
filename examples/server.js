@@ -7,6 +7,8 @@ const attachMocker = createAttachMocker({
   mockDir: path.resolve(__dirname, "mock"),
   onUrlencodedParser: true,
   onJsonBodyParser: true,
+  onLogger: true,
+  onWatcher: true,
 });
 attachMocker(app);
 
