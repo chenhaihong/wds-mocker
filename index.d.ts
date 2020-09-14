@@ -2,17 +2,20 @@ import { Application, Request, Response, NextFunction, request } from "express";
 
 // 模块声明
 declare namespace WdsMocker {
-  export function createAttachMocker(options?: MockerOptions): AttachMocker;
+  export function createAttachMocker(
+    dir: Required<string>,
+    options?: MockerOptions
+  ): AttachMocker;
 
   type AttachMocker = {
     (app: Application): void;
   };
   type MockerOptions = {
-    mockDir?: string;
     onUrlencodedParser?: boolean;
     onJsonBodyParser?: boolean;
     onLogger?: boolean;
     onWatcher?: boolean;
+    onRouteParametersCapturer?: boolean;
   };
   interface MockMap<K, V> extends Map {
     [requestPath: string]: ResultMap;
