@@ -1,4 +1,4 @@
-import { Application, Request, Response, NextFunction, request } from "express";
+import type { Application, Request, Response, NextFunction } from "express";
 
 // 模块声明
 declare namespace WdsMocker {
@@ -7,9 +7,11 @@ declare namespace WdsMocker {
     options?: MockerOptions
   ): AttachMocker;
 
-  type AttachMocker = {
-    (app: Application): void;
-  };
+  export function createAttachUploader(
+    dir: Required<string>,
+    options?: UploaderOptions
+  ): AttachUploader;
+
   type MockerOptions = {
     onUrlencodedParser?: boolean;
     onJsonBodyParser?: boolean;
@@ -17,6 +19,19 @@ declare namespace WdsMocker {
     onWatcher?: boolean;
     onRouteParametersCapturer?: boolean;
   };
+  type AttachMocker = {
+    (app: Application): void;
+  };
+
+  type AttachUploader = {
+    (app: Application): void;
+  };
+  type UploaderOptions = {
+    dest: Required<string>;
+    onWatcher?: boolean;
+    onLogger?: boolean;
+  };
+
   interface MockMap<K, V> extends Map {
     [requestPath: string]: ResultMap;
   }
@@ -30,8 +45,8 @@ declare namespace WdsMocker {
     | object;
 
   interface EventBus extends NodeJS.EventEmitter {
-    emit(event: "update"): void;
-    on(event: "update", handler: Function): this;
+    emit(event: "updateMocker" | "updateUploader"): void;
+    on(event: "updateMocker" | "updateUploader", handler: Function): this;
   }
 }
 export = WdsMocker;

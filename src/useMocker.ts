@@ -1,5 +1,5 @@
-import { Application, Request, Response, NextFunction } from "express";
-import { MockMap, ResultMap, MockResult } from "../index";
+import type { Application, Request, Response, NextFunction } from "express";
+import type { MockMap, ResultMap, MockResult } from "../index";
 
 import path from "path";
 import chalk from "chalk";
@@ -23,7 +23,7 @@ export default function useMocker(
   const { onWatcher, onLogger, onRouteParametersCapturer } = options;
   // 0 订阅，监听文件改变
   if (onWatcher) {
-    eventBus.on("update", () => {
+    eventBus.on("updateMocker", () => {
       isUpdated = true;
     });
   }

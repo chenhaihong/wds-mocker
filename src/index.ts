@@ -1,19 +1,26 @@
+import type { Application } from "express";
+import type {
+  MockerOptions,
+  AttachMocker,
+  UploaderOptions,
+  AttachUploader,
+} from "../index";
+
 import { resolve } from "path";
-import { Application } from "express";
 
 import useUrlencodedParser from "./useUrlencodedParser";
 import useJsonBodyParser from "./useJsonBodyParser";
-import useWatcher from "./useWatcher";
+import useMokcerWatcher from "./useMokcerWatcher";
 import useMocker from "./useMocker";
-
-import { MockerOptions, AttachMocker } from "../index";
+import useUploaderWatcher from "./useUploaderWatcher";
+import useUploader from "./useUploader";
 
 function createAttachMocker(
   dir: Required<string>,
   options?: MockerOptions
 ): AttachMocker {
   if (!dir) {
-    dir = resolve(process.cwd(), "mock");
+    dir = resolve(process.cwd(), "mock/api");
   }
   const {
     onUrlencodedParser = true,
@@ -26,8 +33,25 @@ function createAttachMocker(
   return function attachMocker(app: Application): void {
     onUrlencodedParser && useUrlencodedParser(app);
     onJsonBodyParser && useJsonBodyParser(app);
-    onWatcher && useWatcher(dir, { onLogger });
+
+    onWatcher && useMokcerWatcher(dir, { onLogger });
     useMocker(app, dir, { onWatcher, onLogger, onRouteParametersCapturer });
   };
 }
-export { createAttachMocker };
+
+function createAttachUploader(
+  dir: Required<string>,
+  options?: UploaderOptions
+): AttachUploader {
+  if (!dir) {
+    dir = resolve(process.cwd(), "mock/uploadApi");
+  }
+  const { onLogger = true, onWatcher = true } = options || {};
+
+  return function (app: Application) {
+    onWatcher && useUploaderWatcher(dir, { onLogger });
+    useUploader(app, dir, { onWatcher, onLogger });
+  };
+}
+
+export { createAttachMocker, createAttachUploader };

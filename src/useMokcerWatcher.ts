@@ -21,14 +21,14 @@ const useWatcher = (dir: string, options: { onLogger: boolean }): void => {
       case "unlink":
         clearModule(path);
       case "add":
-        eventBus.emit("update");
+        eventBus.emit("updateMocker");
         break;
       // 文件夹
       case "unlinkDir":
         const regex = new RegExp(`^${path}`, "");
         clearModule.match(regex);
       case "addDir":
-        eventBus.emit("update");
+        eventBus.emit("updateMocker");
         break;
     }
   });

@@ -1,10 +1,16 @@
 const path = require("path");
 const express = require("express");
 const app = express();
-const { createAttachMocker } = require("../");
+const { createAttachMocker, createAttachUploader } = require("../");
 
-const mockDir = path.resolve(__dirname, "mock");
-const attachMocker = createAttachMocker(mockDir, {
+app.use(
+  express.static(path.resolve(__dirname, "public"), {
+    index: "index.html",
+  })
+);
+
+const dir = path.resolve(__dirname, "mock/api");
+const attachMocker = createAttachMocker(dir, {
   onUrlencodedParser: true, // 启用UrlencodedParser，默认为true
   onJsonBodyParser: true, // 启用JsonBodyParser，默认为true
   onLogger: true, // 启用终端日志，默认为true
@@ -13,7 +19,14 @@ const attachMocker = createAttachMocker(mockDir, {
 });
 attachMocker(app);
 
-app.get("/", (req, res) => res.send("Hello World!"));
+const dir2 = path.resolve(__dirname, "mock/uploadApi");
+const attachUploader = createAttachUploader(dir2, {
+  dest: path.resolve(__dirname, "public/uploads"),
+  onLogger: true,
+  onWatcher: true,
+});
+attachUploader(app);
+
 app.use((err, req, res, next) => {
   if (err) {
     return res.send(err.message);
@@ -22,4 +35,6 @@ app.use((err, req, res, next) => {
 });
 
 const port = 3000;
-app.listen(port, () => console.log(`Listening on port ${port}!`));
+app.listen(port, () =>
+  console.log(`Listening on port http://localhost:${port} .`)
+);
