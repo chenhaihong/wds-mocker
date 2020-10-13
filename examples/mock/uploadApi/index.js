@@ -4,7 +4,7 @@ module.exports = {
   // 文件上产模拟接口
   "POST /profile": {
     options: {
-      uploadDir: path.resolve(__dirname, "../public/uploads"),
+      uploadDir: path.resolve(__dirname, "../../public/uploads"),
       maxFilesSize: 1024 * 1024 * 2, // 1024 bytes * 1024 * 2 => 2 Mb
     },
     result: (err, fields, files) => {

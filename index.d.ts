@@ -27,7 +27,6 @@ declare namespace WdsMocker {
     (app: Application): void;
   };
   type UploaderOptions = {
-    dest: Required<string>;
     onWatcher?: boolean;
     onLogger?: boolean;
   };

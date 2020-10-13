@@ -21,24 +21,10 @@ attachMocker(app);
 
 const dir2 = path.resolve(__dirname, "mock/uploadApi");
 const attachUploader = createAttachUploader(dir2, {
-  dest: path.resolve(__dirname, "public/uploads"),
-  onLogger: true,
-  onWatcher: true,
+  onLogger: true, // 启用终端日志，默认为true
+  onWatcher: true, // 启用watcher，监听变动，自动移除require.cache，默认为true
 });
 attachUploader(app);
-
-// const multiparty = require("multiparty");
-// app.post("/profile", (req, res, next) => {
-//   const form = new multiparty.Form({
-//     uploadDir: path.resolve(__dirname, "public/uploads"),
-//   });
-//   form.parse(req, function (err, fields, files) {
-//     if (err) {
-//       return next(err);
-//     }
-//     res.json({ fields, files });
-//   });
-// });
 
 app.use((err, req, res, next) => {
   if (err) {

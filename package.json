@@ -1,6 +1,6 @@
 {
   "name": "@erye/wds-mocker",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Mocker for express or wds.",
   "authors": [
     {

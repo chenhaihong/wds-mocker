@@ -17,7 +17,7 @@ export default function useUploader(
   const { onWatcher, onLogger } = options;
   // 0 订阅，监听文件改变
   if (onWatcher) {
-    eventBus.on("updateMocker", () => {
+    eventBus.on("updateUploader", () => {
       cachedMockMap = null;
     });
   }
@@ -56,6 +56,9 @@ export default function useUploader(
 
       // 5 执行
       const form = new multiparty.Form(optionsResult.options || {});
+      if (optionsResult.options && optionsResult.options.uploadDir) {
+        fse.ensureDirSync(optionsResult.options.uploadDir);
+      }
       form.parse(req, async function (err, fields, files) {
         typeof optionsResult.result === "function"
           ? res.json(await optionsResult.result(err, fields, files))
