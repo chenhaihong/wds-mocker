@@ -27,6 +27,19 @@ const attachUploader = createAttachUploader(dir2, {
 });
 attachUploader(app);
 
+// const multiparty = require("multiparty");
+// app.post("/profile", (req, res, next) => {
+//   const form = new multiparty.Form({
+//     uploadDir: path.resolve(__dirname, "public/uploads"),
+//   });
+//   form.parse(req, function (err, fields, files) {
+//     if (err) {
+//       return next(err);
+//     }
+//     res.json({ fields, files });
+//   });
+// });
+
 app.use((err, req, res, next) => {
   if (err) {
     return res.send(err.message);

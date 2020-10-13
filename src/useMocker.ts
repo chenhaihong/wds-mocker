@@ -63,10 +63,10 @@ export default function useMocker(
 
       // 4 终端打印提示
       if (onLogger) {
-        const _method = chalk.white.bgMagentaBright(` ${upCasedMethod} `);
         const _mockFlag = chalk.white.bgMagentaBright(" WDS-MOCKER ");
+        const _method = chalk.white.bgMagentaBright(` ${upCasedMethod} `);
         const _url = chalk.magentaBright(req.url);
-        console.log(`${_method} ${_mockFlag} ${_url}`);
+        console.log(`${_mockFlag} ${_method} ${_url}`);
       }
 
       // 5 执行

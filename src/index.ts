@@ -10,10 +10,9 @@ import { resolve } from "path";
 
 import useUrlencodedParser from "./useUrlencodedParser";
 import useJsonBodyParser from "./useJsonBodyParser";
-import useMokcerWatcher from "./useMokcerWatcher";
 import useMocker from "./useMocker";
-import useUploaderWatcher from "./useUploaderWatcher";
 import useUploader from "./useUploader";
+import createWatcher from "./createWatcher";
 
 function createAttachMocker(
   dir: Required<string>,
@@ -34,7 +33,9 @@ function createAttachMocker(
     onUrlencodedParser && useUrlencodedParser(app);
     onJsonBodyParser && useJsonBodyParser(app);
 
-    onWatcher && useMokcerWatcher(dir, { onLogger });
+    if (onWatcher) {
+      createWatcher("updateMocker")(dir, { onLogger });
+    }
     useMocker(app, dir, { onWatcher, onLogger, onRouteParametersCapturer });
   };
 }
@@ -49,7 +50,9 @@ function createAttachUploader(
   const { onLogger = true, onWatcher = true } = options || {};
 
   return function (app: Application) {
-    onWatcher && useUploaderWatcher(dir, { onLogger });
+    if (onWatcher) {
+      createWatcher("updateUploader")(dir, { onLogger });
+    }
     useUploader(app, dir, { onWatcher, onLogger });
   };
 }
